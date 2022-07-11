@@ -1,13 +1,23 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to Game
+<PageTitle>TicTacToe</PageTitle>
 @if (_gameOngoing)
 {
-<table class="GameTable">
+	@if(_gameWon)
+	{
+		<h2>@_winInfo</h2>
+	} else
+	{
+		@if(_player1Turn)
+	{
+		<h2>@_player1's turn!</h2>
+	} else
+	{
+		<h2>@_player2's turn!</h2>
+	}
+		
+	}
+	<table class="GameTable">
 	<tr>
 		<td class="@sq1" @onmouseenter="@(e => OnMouseHover("sq1"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq1"))">@game.GameSquares.ElementAt(0).Input</td> 
 		<td class="@sq2" @onmouseenter="@(e => OnMouseHover("sq2"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq2"))">@game.GameSquares.ElementAt(1).Input</td> 
@@ -24,11 +34,12 @@ Welcome to Game
 		<td class="@sq9" @onmouseenter="@(e => OnMouseHover("sq9"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq9"))">@game.GameSquares.ElementAt(8).Input</td>
 	</tr>
 	</table>
+
 	<button @onclick="@ResetGame">Reset</button>
 } else
 {
-	<p>Choose your weapon:</p>
-	<EditForm Model="@_state" OnSubmit="@SetInput">
+	<p>Enter your name and choose your weapon!</p>
+	<EditForm Model="@_state" OnSubmit="@SetGame">
 		<InputText @bind-Value="_state.Player1Name" placeholder="Player 1 Name"></InputText> 
 		<br />
 	<InputSelect @bind-Value="_state.Inputs">
@@ -56,14 +67,28 @@ Welcome to Game
 	private string _humanInput { get; set; } = "";
 	private string _player2Input { get { return (_humanInput == "X") ? "O" : "X"; } }
 	private bool _againstComputer { get; set; }
-	private string _player1 { get; set; } = string.Empty;
-	private string _player2 { get; set; } = string.Empty;
+	private bool _gameWon { get; set; } = false;
+	private string _player1 { get; set; } = "player 1";
+	private string _player2 { get; set; } = "player 2";
+	private string _winInfo { get; set; } = string.Empty;
 
 	private GameTable game = new GameTable();
 	private GameState _state = new GameState();
 
 	private bool _gameOngoing { get; set; } = false;
 	private bool _player1Turn { get; set; } = true;
+
+	private List<List<int>> _winningLines = new List<List<int>>()
+	{
+		new List<int>() {1,2,3},
+		new List<int>() {4,5,6},
+		new List<int>() {7,8,9},
+		new List<int>() {1,5,9},
+		new List<int>() {3,5,7},
+		new List<int>() {1,4,7},
+		new List<int>() {2,5,8},
+		new List<int>() {3,6,9},
+	};
 
 	public void UserClick(string square)
 	{
@@ -205,12 +230,35 @@ Welcome to Game
 				}
 				break;
 		}
-		_player1Turn = !_player1Turn;
+		switch(_player1Turn)
+		{
+			case true:
+				CheckGame(_humanInput, _player1);
+				_player1Turn = !_player1Turn;
+				break;
+			case false:
+				CheckGame(_player2Input, _player2);
+				_player1Turn = !_player1Turn;
+				break;
+		}
+		if (_againstComputer && !_gameWon)
+		{
+			ComputerTurn();
+		}
 	}
 
-	public void SetInput()
+	public void SetGame()
 	{
 		_humanInput = _state.Inputs.ToString();
+		_againstComputer = _state.AgainstComputer;
+		_player1 = (_state.Player1Name == "") ? "Player 1" : _state.Player1Name;
+		if (_state.AgainstComputer)
+		{
+			_player2 = "Computer";
+		} else
+		{
+			_player2 = (_state.P2 == "") ? "Player 2" : _state.Player1Name;
+		}
 		_gameOngoing = true;
 		_player1Turn = true;
 		_state = new GameState();
@@ -285,11 +333,46 @@ Welcome to Game
 	public void ResetGame()
 	{
 		_gameOngoing = false;
+		_winInfo = string.Empty;
+		_gameWon = false;
 		foreach (var sq in game.GameSquares)
 		{
 			sq.Input = " ";
 		}
 	}
+	public void ComputerTurn()
+	{
+		game.GameSquares.Where(x => !x.HasValue).First().Input = _player2Input;
+		CheckGame(_player2Input, _player2);
+		_player1Turn = !_player1Turn;
+	}
+
+	public void CheckGame(string inputValue, string player)
+	{
+		var playerInputs = game.GameSquares.Where(x => x.Input == inputValue).Select(x => x.Id);
+		foreach (var line in _winningLines)
+		{
+			CheckLine(line, inputValue, player);
+		}
+	}
+
+	public void CheckLine(List<int> Id, string playerInputValue, string player)
+	{
+		var count = 0;
+		foreach (int id in Id)
+		{
+			if (game.GameSquares.Where(x => x.Id == id).Where(x => x.Input == playerInputValue).Any())
+			{
+				count++;
+			}
+		}
+		if (count == 3)
+		{
+			_gameWon = true;
+			_winInfo = $"{player} Won!!";
+		}
+	}
+
 
 	private string sq1 { get; set; } = "squareOne";
 	private string sq2 { get; set; } = "squareTwo";
