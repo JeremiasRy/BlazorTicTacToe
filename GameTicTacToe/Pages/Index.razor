@@ -28,12 +28,25 @@ Welcome to Game
 } else
 {
 	<p>Choose your weapon:</p>
-	<EditForm Model="@_input" OnSubmit="@SetInput">
-		<InputSelect @bind-Value="_input.Inputs">
+	<EditForm Model="@_state" OnSubmit="@SetInput">
+		<InputText @bind-Value="_state.Player1Name" placeholder="Player 1 Name"></InputText> 
+		<br />
+	<InputSelect @bind-Value="_state.Inputs">
 			<option value="X">X</option>
 			<option value="O">O</option>
 		</InputSelect>
-		<button type="submit">Choose</button>
+	<br/>
+		@if (!_state.AgainstComputer)
+		{
+			<InputText @bind-Value="_state.P2" placeholder="player 2 Name"></InputText>
+		}
+		<br/>
+
+		<label for="computercheck">Play against computer?</label>
+		<InputCheckbox id="computercheck" @bind-Value="@_state.AgainstComputer">
+		</InputCheckbox>
+		<br/>
+		<button class="btn btn-primary" type="submit">Start game</button>
 	</EditForm>
 }
 
@@ -42,9 +55,12 @@ Welcome to Game
 @code {
 	private string _humanInput { get; set; } = "";
 	private string _player2Input { get { return (_humanInput == "X") ? "O" : "X"; } }
+	private bool _againstComputer { get; set; }
+	private string _player1 { get; set; } = string.Empty;
+	private string _player2 { get; set; } = string.Empty;
 
 	private GameTable game = new GameTable();
-	private Input _input = new Input();
+	private GameState _state = new GameState();
 
 	private bool _gameOngoing { get; set; } = false;
 	private bool _player1Turn { get; set; } = true;
@@ -194,10 +210,10 @@ Welcome to Game
 
 	public void SetInput()
 	{
-		_humanInput = _input.Inputs.ToString();
+		_humanInput = _state.Inputs.ToString();
 		_gameOngoing = true;
 		_player1Turn = true;
-		_input = new Input();
+		_state = new GameState();
 	}
 	public void OnMouseHover(string orig)
 	{
