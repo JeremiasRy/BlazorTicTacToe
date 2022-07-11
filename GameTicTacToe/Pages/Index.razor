@@ -1,0 +1,291 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to Game
+@if (_gameOngoing)
+{
+<table class="GameTable">
+	<tr>
+		<td class="@sq1" @onmouseenter="@(e => OnMouseHover("sq1"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq1"))">@game.GameSquares.ElementAt(0).Input</td> 
+		<td class="@sq2" @onmouseenter="@(e => OnMouseHover("sq2"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq2"))">@game.GameSquares.ElementAt(1).Input</td> 
+		<td class="@sq3" @onmouseenter="@(e => OnMouseHover("sq3"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq3"))">@game.GameSquares.ElementAt(2).Input</td>
+	</tr>
+	<tr>
+		<td class="@sq4" @onmouseenter="@(e => OnMouseHover("sq4"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq4"))">@game.GameSquares.ElementAt(3).Input</td> 
+		<td class="@sq5" @onmouseenter="@(e => OnMouseHover("sq5"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq5"))">@game.GameSquares.ElementAt(4).Input</td> 
+		<td class="@sq6" @onmouseenter="@(e => OnMouseHover("sq6"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq6"))">@game.GameSquares.ElementAt(5).Input</td>
+	</tr>
+		<tr>
+		<td class="@sq7" @onmouseenter="@(e => OnMouseHover("sq7"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq7"))">@game.GameSquares.ElementAt(6).Input</td> 
+		<td class="@sq8" @onmouseenter="@(e => OnMouseHover("sq8"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq8"))">@game.GameSquares.ElementAt(7).Input</td>
+		<td class="@sq9" @onmouseenter="@(e => OnMouseHover("sq9"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq9"))">@game.GameSquares.ElementAt(8).Input</td>
+	</tr>
+	</table>
+	<button @onclick="@ResetGame">Reset</button>
+} else
+{
+	<p>Choose your weapon:</p>
+	<EditForm Model="@_input" OnSubmit="@SetInput">
+		<InputSelect @bind-Value="_input.Inputs">
+			<option value="X">X</option>
+			<option value="O">O</option>
+		</InputSelect>
+		<button type="submit">Choose</button>
+	</EditForm>
+}
+
+
+
+@code {
+	private string _humanInput { get; set; } = "";
+	private string _player2Input { get { return (_humanInput == "X") ? "O" : "X"; } }
+
+	private GameTable game = new GameTable();
+	private Input _input = new Input();
+
+	private bool _gameOngoing { get; set; } = false;
+	private bool _player1Turn { get; set; } = true;
+
+	public void UserClick(string square)
+	{
+		switch(square)
+		{
+			case "sq1":
+				if (game.GameSquares.ElementAt(0).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(0).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(0).Input = _player2Input;
+						break;
+				}
+				break;
+			case "sq2":
+				if (game.GameSquares.ElementAt(1).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(1).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(1).Input = _player2Input;
+						break;
+				}
+				break;
+			case "sq3":
+				if (game.GameSquares.ElementAt(2).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(2).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(2).Input = _player2Input;
+						break;
+				}
+				break;
+			case "sq4":
+				if (game.GameSquares.ElementAt(3).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(3).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(3).Input = _player2Input;
+						break;
+				}
+				break;
+			case "sq5":
+				if (game.GameSquares.ElementAt(4).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(4).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(4).Input = _player2Input;
+						break;
+				}
+				break;
+			case "sq6":
+				if (game.GameSquares.ElementAt(5).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(5).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(5).Input = _player2Input;
+						break;
+				}
+				break;
+			case "sq7":
+				if (game.GameSquares.ElementAt(6).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(6).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(6).Input = _player2Input;
+						break;
+				}
+				break;
+			case "sq8":
+				if (game.GameSquares.ElementAt(7).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(7).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(7).Input = _player2Input;
+						break;
+				}
+				break;
+			case "sq9":
+				if (game.GameSquares.ElementAt(8).HasValue)
+				{
+					return;
+				}
+				switch (_player1Turn)
+				{
+					case true:
+						game.GameSquares.ElementAt(8).Input = _humanInput;
+						break;
+					case false:
+						game.GameSquares.ElementAt(8).Input = _player2Input;
+						break;
+				}
+				break;
+		}
+		_player1Turn = !_player1Turn;
+	}
+
+	public void SetInput()
+	{
+		_humanInput = _input.Inputs.ToString();
+		_gameOngoing = true;
+		_player1Turn = true;
+		_input = new Input();
+	}
+	public void OnMouseHover(string orig)
+	{
+		temp = orig;
+		switch(orig)
+		{
+			case "sq1":
+				sq1 = hover;
+				break;
+			case "sq2":
+				sq2 = hover;
+				break;
+			case "sq3":
+				sq3 = hover;
+				break;
+			case "sq4":
+				sq4 = hover;
+				break;
+			case "sq5":
+				sq5 = hover;
+				break;
+			case "sq6":
+				sq6 = hover;
+				break;
+			case "sq7":
+				sq7 = hover;
+				break;
+			case "sq8":
+				sq8 = hover;
+				break;
+			case "sq9":
+				sq9 = hover;
+				break;
+		}
+	}
+	public void OnMouseOut()
+	{
+		switch(temp)
+		{
+			case "sq1":
+				sq1 = "squareOne";
+				break;
+			case "sq2":
+				sq2 = "squareTwo";
+				break;
+			case "sq3":
+				sq3 = "squareThree";
+				break;
+			case "sq4":
+				sq4 = "squareFour";
+				break;
+			case "sq5":
+				sq5 = "squareFive";
+				break;
+			case "sq6":
+				sq6 = "squareSix";
+				break;
+			case "sq7":
+				sq7 = "squareSeven";
+				break;
+			case "sq8":
+				sq8 = "squareEigth";
+				break;
+			case "sq9":
+				sq9 = "squareNine";
+				break;
+		}
+	}
+	public void ResetGame()
+	{
+		_gameOngoing = false;
+		foreach (var sq in game.GameSquares)
+		{
+			sq.Input = " ";
+		}
+	}
+
+	private string sq1 { get; set; } = "squareOne";
+	private string sq2 { get; set; } = "squareTwo";
+	private string sq3 { get; set; } = "squareThree";
+	private string sq4 { get; set; } = "squareFour";
+	private string sq5 { get; set; } = "squareFive";
+	private string sq6 { get; set; } = "squareSix";
+	private string sq7 { get; set; } = "squareSeven";
+	private string sq8 { get; set; } = "squareEigth";
+	private string sq9 { get; set; } = "squareNine";
+
+	private string hover { get; set; } = "hover";
+	private string temp { get; set; } = "";
+
+}
