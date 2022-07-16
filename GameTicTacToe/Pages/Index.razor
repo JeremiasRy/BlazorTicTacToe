@@ -1,22 +1,30 @@
 ﻿@page "/"
 
 <PageTitle>TicTacToe</PageTitle>
+<h1>TicTacToe</h1>
 @if (_gameOngoing)
 {
 	@if(_gameWon)
 	{
 		<h2>@_winInfo</h2>
+		<button @onclick="@ResetGame" class="btn btn-primary">Reset game</button> 
+		<button @onclick="@PlayAgain" class="btn btn-secondary">Again??</button>
 	} else
 	{
-		@if(_player1Turn)
-	{
-		<h2>@_player1's turn!</h2>
-	} else
-	{
-		<h2>@_player2's turn!</h2>
-	}
 		
+	@if(_player1Turn)
+		{
+			<h2>@_player1's turn!</h2>
+
+		} else
+		{
+
+			<h2>@_player2's turn!</h2>
+		}
+		<button @onclick="@ResetGame" class="btn btn-primary">Reset game</button> <br/>
 	}
+	<br/>
+	<br/>
 	<table class="GameTable">
 	<tr>
 		<td class="@sq1" @onmouseenter="@(e => OnMouseHover("sq1"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq1"))">@game.GameSquares.ElementAt(0).Input</td> 
@@ -34,8 +42,6 @@
 		<td class="@sq9" @onmouseenter="@(e => OnMouseHover("sq9"))" @onmouseleave="(e => OnMouseOut())" @onclick="@(e => UserClick("sq9"))">@game.GameSquares.ElementAt(8).Input</td>
 	</tr>
 	</table>
-
-	<button @onclick="@ResetGame">Reset</button>
 } else
 {
 	<p>Enter your name and choose your weapon!</p>
@@ -66,8 +72,6 @@
 @code {
 	private string _humanInput { get; set; } = "";
 	private string _player2Input { get { return (_humanInput == "X") ? "O" : "X"; } }
-	private bool _againstComputer { get; set; }
-	private bool _gameWon { get; set; } = false;
 	private string _player1 { get; set; } = "player 1";
 	private string _player2 { get; set; } = "player 2";
 	private string _winInfo { get; set; } = string.Empty;
@@ -77,17 +81,20 @@
 
 	private bool _gameOngoing { get; set; } = false;
 	private bool _player1Turn { get; set; } = true;
+	private bool _againstComputer { get; set; }
+	private bool _gameWon { get; set; } = false;
 
 	private List<List<int>> _winningLines = new List<List<int>>()
 	{
-		new List<int>() {1,2,3},
-		new List<int>() {4,5,6},
-		new List<int>() {7,8,9},
-		new List<int>() {1,5,9},
-		new List<int>() {3,5,7},
-		new List<int>() {1,4,7},
-		new List<int>() {2,5,8},
-		new List<int>() {3,6,9},
+		new List<int>(){1,2,3},
+		new List<int>(){4,5,6},
+		new List<int>(){7,8,9},
+		new List<int>(){1,4,7},
+		new List<int>(){2,5,8},
+		new List<int>(){3,6,9},
+		new List<int>(){1,5,9},
+		new List<int>(){3,5,7},
+
 	};
 
 	public void UserClick(string square)
@@ -257,7 +264,7 @@
 			_player2 = "Computer";
 		} else
 		{
-			_player2 = (_state.P2 == "") ? "Player 2" : _state.Player1Name;
+			_player2 = (_state.P2 == "") ? "Player 2" : _state.P2;
 		}
 		_gameOngoing = true;
 		_player1Turn = true;
@@ -340,19 +347,43 @@
 			sq.Input = " ";
 		}
 	}
+	public void PlayAgain()
+	{
+		foreach (var sq in game.GameSquares)
+		{
+			sq.Input = " ";
+		}
+		_gameWon = false;
+		if (_againstComputer && !_player1Turn)
+		{
+			ComputerTurn();
+		}
+	}
 	public void ComputerTurn()
 	{
-		game.GameSquares.Where(x => !x.HasValue).First().Input = _player2Input;
+		if (!game.GameSquares.Where(x => x.HasValue).Any())
+		{
+			game.GameSquares.ElementAt(Computer.random.Next(1, 9)).Input = _player2Input;
+			_player1Turn = !_player1Turn;
+			return;
+		}
+		var pos = Computer.BestPosition(game.GameSquares, _winningLines, _player2Input);
+		game.GameSquares.ElementAt(pos - 1).Input = _player2Input;
 		CheckGame(_player2Input, _player2);
 		_player1Turn = !_player1Turn;
 	}
 
-	public void CheckGame(string inputValue, string player)
+	public void CheckGame(string inputValue, string player) // check for winner or tie
 	{
 		var playerInputs = game.GameSquares.Where(x => x.Input == inputValue).Select(x => x.Id);
 		foreach (var line in _winningLines)
 		{
 			CheckLine(line, inputValue, player);
+		}
+		if (game.GameSquares.Where(x => x.HasValue).Count() == 9)
+		{
+			_gameWon = true;
+			_winInfo = "It's a tie!!";
 		}
 	}
 
