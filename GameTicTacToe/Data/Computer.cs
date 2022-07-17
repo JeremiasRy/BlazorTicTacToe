@@ -14,25 +14,22 @@ namespace GameTicTacToe.Data
             List<List<int>> dangerLines = CheckLines(opponentInput);
             List<List<int>> winLines = CheckLines(computerInput);
 
-            int bestPositionId = 0;
-
             bool gameEndingSituation = dangerLines.First().Last() == 2  || winLines.First().Last() == 2;    
-
 
             if (gameEndingSituation)
             {
 
                 var LinesToEnd = winLines.First().Last() == 2 ? winLines : dangerLines;
-                TakeAction(LinesToEnd.First(), false);
+                return TakeAction(LinesToEnd.First(), false, openGameState);
 
             }
             else if (openGameState.Count() == 9)
             {
-                TakeAction(new List<int>(), true);
+                return TakeAction(new List<int>(), true, openGameState);
             } 
             else
             {
-                TakeAction(winLines.First(), false);
+                return TakeAction(dangerLines.First(), false, openGameState);
             }
 
    
@@ -79,19 +76,19 @@ namespace GameTicTacToe.Data
                 return LineInGame.Where(x => x.HasValue).Count() == 3;
             }
 
-            void TakeAction(List<int> lineToTakeActionFrom, bool startingTurn)
+            int TakeAction(List<int> lineToTakeActionFrom, bool startingTurn, IEnumerable<GameSquare> openGameState)
             {
                 if (startingTurn)
                 {
-                    bestPositionId = random.Next(1, 9);
+                    return random.Next(1, 9);
                 }
                 else
                 {
-                    bestPositionId = openGameState.FirstOrDefault(x => lineToTakeActionFrom.Any(line => line == x.Id)).Id;
-                    
+                    lineToTakeActionFrom.RemoveAt(lineToTakeActionFrom.Count - 1);  
+                    var gameSquare = openGameState.FirstOrDefault(x => lineToTakeActionFrom.Any(line => line == x.Id));
+                    return gameSquare == null ? 0 : gameSquare.Id;
                 }
             }
-            return bestPositionId;
 		}
     }
 }
